@@ -1,0 +1,5 @@
+export class MobileControls {
+  constructor(player){this.player=player;this.zone=document.getElementById('joystick-zone');this.base=document.getElementById('joystick-base');this.stick=document.getElementById('joystick-stick');this.active=false;this.center={x:0,y:0};this.bind();}
+  bind(){this.zone.addEventListener('pointerdown',e=>{this.active=true;this.zone.setPointerCapture(e.pointerId);const r=this.base.getBoundingClientRect();this.center={x:r.left+r.width/2,y:r.top+r.height/2};this.move(e);});this.zone.addEventListener('pointermove',e=>{if(this.active)this.move(e);});const end=()=>{this.active=false;this.stick.style.transform='translate(0px,0px)';this.player.setMove(0,0);};this.zone.addEventListener('pointerup',end);this.zone.addEventListener('pointercancel',end);}
+  move(e){let dx=e.clientX-this.center.x,dy=e.clientY-this.center.y;const max=37,len=Math.hypot(dx,dy);if(len>max){dx=dx/len*max;dy=dy/len*max;}this.stick.style.transform=`translate(${dx}px,${dy}px)`;this.player.setMove(dx/max,-dy/max);}
+}
