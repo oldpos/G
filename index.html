@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <meta name="theme-color" content="#08090b" />
+  <meta name="description" content="THE LAST MIND — a psychological horror brain-puzzle prototype." />
+  <title>THE LAST MIND</title>
+  <link rel="stylesheet" href="./style.css" />
+  <script type="importmap">
+    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}
+  </script>
+</head>
+<body>
+  <div id="game-root">
+    <canvas id="game-canvas" aria-label="3D horror game scene"></canvas>
+
+    <section id="main-menu" class="screen visible">
+      <div class="menu-backdrop"></div>
+      <div class="menu-content">
+        <p class="eyebrow">A PSYCHOLOGICAL HORROR EXPERIENCE</p>
+        <h1>THE LAST <span>MIND</span></h1>
+        <p class="tagline">YOUR BRAIN IS THE ONLY WAY OUT.</p>
+        <div class="menu-actions">
+          <button id="new-game" class="primary">NEW GAME</button>
+          <button id="continue-game" class="secondary">CONTINUE</button>
+          <button id="how-to-play" class="text-button">HOW TO PLAY</button>
+        </div>
+        <p class="menu-foot">PROTOTYPE 01 <span>•</span> THE AWAKENING</p>
+      </div>
+    </section>
+
+    <section id="hud" class="hidden">
+      <div class="hud-top">
+        <div class="chapter-label"><span class="live-dot"></span><span>CHAPTER 01</span><strong>THE LOCKED ROOM</strong></div>
+        <div class="hud-status"><span id="objective">Find a way out.</span><span class="battery">LIGHT <b id="battery-level">100%</b></span></div>
+      </div>
+      <div id="crosshair"></div>
+      <div id="interaction-prompt" class="interaction-prompt hidden">[ E ] INTERACT</div>
+      <div class="hud-bottom">
+        <div class="hint-line">LOOK CLOSELY. NOTHING HERE IS ACCIDENTAL.</div>
+        <div class="hud-buttons">
+          <button id="flashlight-btn" class="hud-button">LIGHT <kbd>F</kbd></button>
+          <button id="notebook-btn" class="hud-button">NOTES <kbd>N</kbd></button>
+          <button id="pause-btn" class="hud-button">PAUSE <kbd>ESC</kbd></button>
+        </div>
+      </div>
+      <div id="mobile-controls" class="hidden">
+        <div id="joystick-zone"><div id="joystick-base"><div id="joystick-stick"></div></div></div>
+        <div class="mobile-actions"><button id="mobile-light">☼</button><button id="mobile-interact">E</button></div>
+      </div>
+    </section>
+
+    <section id="puzzle-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="puzzle-title">
+      <div class="modal-card puzzle-card">
+        <div class="modal-top"><span class="eyebrow">SECURITY TERMINAL // 01</span><button class="close-modal" data-close="puzzle-modal" aria-label="Close">×</button></div>
+        <h2 id="puzzle-title">THE FIRST TEST</h2>
+        <p id="puzzle-description">A sequence is scratched into the metal.</p>
+        <div id="puzzle-stage" class="puzzle-stage"></div>
+        <form id="puzzle-form">
+          <label id="answer-label" for="puzzle-answer">YOUR ANSWER</label>
+          <input id="puzzle-answer" type="text" inputmode="numeric" autocomplete="off" placeholder="Enter answer" required />
+          <p id="puzzle-feedback" class="feedback" aria-live="polite"></p>
+          <button class="primary full" type="submit">SUBMIT ANSWER</button>
+        </form>
+        <p class="microcopy">Wrong answers are not the end. Think again.</p>
+      </div>
+    </section>
+
+    <section id="notebook-modal" class="modal hidden" role="dialog" aria-modal="true">
+      <div class="modal-card note-card">
+        <div class="modal-top"><span class="eyebrow">FIELD NOTES</span><button class="close-modal" data-close="notebook-modal">×</button></div>
+        <h2>WHAT YOU KNOW</h2>
+        <ul id="clue-list"><li>The room smells of damp concrete.</li><li>A terminal guards the exit.</li></ul>
+        <p class="microcopy">Observe the room. Clues may be hiding in plain sight.</p>
+      </div>
+    </section>
+
+    <section id="pause-modal" class="modal hidden" role="dialog" aria-modal="true">
+      <div class="modal-card pause-card">
+        <p class="eyebrow">THE WORLD IS WAITING</p><h2>PAUSED</h2>
+        <button id="resume-game" class="primary full">RESUME</button>
+        <button id="save-menu" class="secondary full">SAVE & MAIN MENU</button>
+      </div>
+    </section>
+
+    <section id="howto-modal" class="modal hidden" role="dialog" aria-modal="true">
+      <div class="modal-card note-card">
+        <div class="modal-top"><span class="eyebrow">SURVIVAL MANUAL</span><button class="close-modal" data-close="howto-modal">×</button></div>
+        <h2>HOW TO PLAY</h2>
+        <ul><li><b>PC:</b> WASD to move, mouse to look, click to capture the mouse.</li><li><b>Interact:</b> Aim at an object and press E, or click it.</li><li><b>Flashlight:</b> Press F.</li><li><b>Notes:</b> Press N to review discovered clues.</li><li><b>Mobile:</b> Use the left joystick to move and drag the right side to look. Tap E to interact.</li><li>Solve both stages of the terminal puzzle to unlock the exit.</li></ul>
+      </div>
+    </section>
+
+    <section id="completion-screen" class="screen hidden">
+      <div class="menu-content completion-content">
+        <p class="eyebrow">CHAPTER 01 // COMPLETE</p>
+        <h1>YOU <span>ESCAPED.</span></h1>
+        <p class="tagline">THE DOOR OPENED. SOMETHING ELSE DID TOO.</p>
+        <div class="completion-stats"><span>PUZZLE SOLVED</span><span>EXIT UNLOCKED</span><span>PROTOTYPE CLEAR</span></div>
+        <button id="return-menu" class="primary">RETURN TO MENU</button>
+      </div>
+    </section>
+
+    <div id="toast" class="toast hidden" role="status"></div>
+    <div id="loading" class="loading"><div class="loader-mark">LM</div><span>ENTERING THE FACILITY</span></div>
+  </div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
